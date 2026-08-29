@@ -2,32 +2,33 @@ name: Deploy static site to GitHub Pages
 
 on:
   push:
-    branches: [ main, master ]
+    branches:
+      - main
 
 permissions:
   contents: read
   pages: write
   id-token: write
 
+concurrency:
+  group: pages
+  cancel-in-progress: true
+
 jobs:
   deploy:
     runs-on: ubuntu-latest
-
-    concurrency:
-      group: "pages-deploy-${{ github.ref }}"
-      cancel-in-progress: true
 
     steps:
       - name: Checkout
         uses: actions/checkout@v4
 
-      - name: Configure GitHub Pages
-        uses: actions/configure-pages@v3
+      - name: Setup Pages
+        uses: actions/configure-pages@v5
 
-      - name: Upload artifact for deployment
-        uses: actions/upload-pages-artifact@v2
+      - name: Upload Pages artifact
+        uses: actions/upload-pages-artifact@v3
         with:
           path: ./
 
       - name: Deploy to GitHub Pages
-        uses: actions/deploy-pages@v1
+        uses: actions/deploy-pages@v4
