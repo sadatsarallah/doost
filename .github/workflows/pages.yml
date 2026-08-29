@@ -4,15 +4,24 @@ on:
   push:
     branches: [ main, master ]
 
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
 jobs:
   deploy:
     runs-on: ubuntu-latest
+
+    concurrency:
+      group: "pages-deploy-${{ github.ref }}"
+      cancel-in-progress: true
 
     steps:
       - name: Checkout
         uses: actions/checkout@v4
 
-      - name: Set up Pages
+      - name: Configure GitHub Pages
         uses: actions/configure-pages@v3
 
       - name: Upload artifact for deployment
