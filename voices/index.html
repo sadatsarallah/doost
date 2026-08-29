@@ -1,0 +1,51 @@
+<!doctype html>
+<html lang="fa" dir="rtl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>صدای من - Voices</title>
+<style>
+body{font-family:Tahoma, Arial, sans-serif; background:#fffafd; color:#40363b; padding:24px}
+.container{max-width:760px;margin:0 auto}
+h1{font-size:24px;margin-bottom:12px}
+.voice{background:#fff;border:1px solid #eee;padding:12px;border-radius:10px;margin-bottom:10px;display:flex;gap:12px;align-items:center}
+.voice .meta{flex:1}
+.back{display:inline-block;margin-bottom:18px;padding:8px 12px;background:#f3f0f4;border-radius:8px;text-decoration:none;color:#40363b}
+.empty{color:#8f8188}
+</style>
+</head>
+<body>
+<div class="container">
+<a class="back" href="../دوست.html">◀ بازگشت</a>
+<h1>صداهای ارسال‌شده</h1>
+<div id="list"></div>
+</div>
+<script>
+function render(){
+  const list = document.getElementById('list');
+  const voices = JSON.parse(localStorage.getItem('voices') || '[]').slice().reverse();
+  if(voices.length===0){
+    list.innerHTML = '<p class="empty">فعلاً صدایی ارسال نشده.</p>';
+    return;
+  }
+  list.innerHTML = '';
+  voices.forEach(v=>{
+    const el = document.createElement('div');
+    el.className = 'voice';
+    const meta = document.createElement('div');
+    meta.className = 'meta';
+    meta.innerHTML = '<div><strong>ارسال‌شده:</strong> ' + new Date(v.created).toLocaleString() + '</div>';
+    const audio = document.createElement('audio');
+    audio.controls = true;
+    audio.src = v.data;
+    audio.style.width = '260px';
+    el.appendChild(meta);
+    el.appendChild(audio);
+    list.appendChild(el);
+  });
+}
+
+render();
+</script>
+</body>
+</html>
