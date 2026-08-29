@@ -21,7 +21,41 @@ h1{font-size:24px;margin-bottom:12px}
 <div id="list"></div>
 </div>
 <script>
-function render(){
+async function listFromGitHub(){
+  const api = 'https://api.github.com/repos/sadatsarallah/doost/contents/voices';
+  try{
+    const res = await fetch(api);
+    if(!res.ok) throw new Error('no-remote');
+    const arr = await res.json();
+    const list = document.getElementById('list');
+    if(!Array.isArray(arr) || arr.length===0){
+      list.innerHTML = '<p class="empty">فعلاً صدایی ارسال نشده.</p>';
+      return;
+    }
+    list.innerHTML = '';
+    // sort by name or path so newest appear first if names include timestamp
+    arr.sort((a,b)=> (b.name||'').localeCompare(a.name||''));
+    arr.forEach(item=>{
+      const el = document.createElement('div');
+      el.className = 'voice';
+      const meta = document.createElement('div');
+      meta.className = 'meta';
+      meta.innerHTML = '<div><strong>فایل:</strong> ' + (item.name||'') + '</div>';
+      const audio = document.createElement('audio');
+      audio.controls = true;
+      audio.src = item.download_url || item.url;
+      audio.style.width = '260px';
+      el.appendChild(meta);
+      el.appendChild(audio);
+      list.appendChild(el);
+    });
+    return true;
+  }catch(e){
+    return false;
+  }
+}
+
+function renderFromLocal(){
   const list = document.getElementById('list');
   const voices = JSON.parse(localStorage.getItem('voices') || '[]').slice().reverse();
   if(voices.length===0){
@@ -45,7 +79,19 @@ function render(){
   });
 }
 
-render();
+async function render(){
+  const ok = await listFromGitHub();
+  if(!ok) renderFromLocal();
+}
+
+document.addEventListener('DOMContentLoaded', render);
+
+// manual refresh button
+const btn = document.createElement('button');
+btn.textContent = 'بارگذاری مجدد';
+btn.style.marginBottom='12px';
+btn.onclick = () => render();
+document.querySelector('.container').insertBefore(btn, document.getElementById('list'));
 </script>
 </body>
 </html>

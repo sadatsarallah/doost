@@ -2229,6 +2229,22 @@ const sendButton =
     );
 
 let lastAudioBlob = null;
+// Optional serverless upload endpoint (set this to your deployed Vercel/Netlify function)
+const UPLOAD_API = '';
+
+async function uploadToServerless(base64Data, filename){
+    if(!UPLOAD_API) return { ok: false, error: 'no-endpoint' };
+    try{
+        const res = await fetch(UPLOAD_API, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ filename, content: base64Data.split(',')[1] })
+        });
+        return await res.json();
+    }catch(e){
+        return { ok: false, error: e.message };
+    }
+}
 
 
 /* =========================================================
@@ -3010,6 +3026,21 @@ function createAudio(){
                         data: dataUrl
                     });
                     localStorage.setItem('voices', JSON.stringify(voices));
+
+                    // If UPLOAD_API is configured, also send the audio to the serverless uploader
+                    (async ()=>{
+                        if(UPLOAD_API){
+                            try{
+                                const timestamp = (new Date()).getTime();
+                                const filename = `voice-${timestamp}.webm`;
+                                const result = await uploadToServerless(dataUrl, filename);
+                                // optional: show a small notice
+                                console.log('upload result', result);
+                            }catch(e){
+                                console.error('upload failed', e);
+                            }
+                        }
+                    })();
 
                     // باز کردن صفحهٔ voices در تب جدید تا فرستنده در صفحه اصلی بماند
                     window.open('voices/index.html', '_blank');

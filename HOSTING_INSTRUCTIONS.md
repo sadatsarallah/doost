@@ -1,3 +1,11 @@
+Serverless upload (optional)
+- To make uploaded voices centrally available, deploy the provided Vercel function:
+	- See `serverless/README.md` for `api/upload.js` and deployment steps.
+	- Set `GITHUB_TOKEN` in Vercel environment variables (token must have repo write permissions).
+	- Update your client `دوست.html` to POST base64 recordings to `https://<your-vercel-app>.vercel.app/api/upload`.
+Notes & tips
+- If you want the site to be at the repository root URL (e.g., `https://your-username.github.io/your-repo/دوست.html`), place `index.html` in the repo root or link directly to `دوست.html`.
+- For audio files: the repo will contain uploaded audio files only if you use the optional GitHub upload panel (it uses your PAT to PUT files into the repo). Be careful with token security.
 Hosting this project on GitHub Pages
 =================================
 
